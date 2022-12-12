@@ -3,30 +3,37 @@ def main():
     with open('input.txt') as f:
         moves = [line.strip() for line in f.readlines()]
 
-    print(moves)
 
     positions = set()
 
+    rope = [(0, 0) for i in range(10)]
+    print(rope)
     # position = (x, y)
-    head = (0, 0)
-    tail = (0, 0)
+    head = rope[0]
+    tail = rope[-1]
     positions.add(tail)
     for move in moves:
         for _ in range(int(move[2:])):
             direction = move[0]
-            
+            head = rope[0]
             if direction == "R":
-                head = (head[0]+1, head[1])
+                rope[0] = (head[0]+1, head[1])
             elif direction == "L":
-                head = (head[0]-1, head[1])
+                rope[0] = (head[0]-1, head[1])
             elif direction == "U":
-                head = (head[0], head[1]+1)
+                rope[0] = (head[0], head[1]+1)
             elif direction == "D":
-                head = (head[0], head[1]-1)
-            tail = move_tail(head, tail)
-            positions.add(tail)
-            print(head)
-            print(tail)
+                rope[0] = (head[0], head[1]-1)
+            
+            for i in range(9):
+                knot1 = rope[i]
+                knot2 = rope[i+1]
+                rope[i+1] = move_tail(knot1, knot2)
+
+            positions.add(rope[-1])
+        print(rope)
+            # print(head)
+            # print(tail)
 
     print(positions)
     print(len(positions))
