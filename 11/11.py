@@ -13,7 +13,6 @@ class Monkey:
     def __init__(self, info:list):
         self.num = int(info[0][-2])
         items = [item for item in info[1][16:].split()]
-        items[0] = items[0][:-1]
         self.items = [int(item) if ',' not in item else int(item[:-1]) for item in items]
         self.operation_sign = info[2].split()[4]
         self.operation_num = info[2].split()[5]
@@ -24,8 +23,11 @@ class Monkey:
     def operation(self, index):
         if self.operation_num == "old":
             self.operation_num = self.items[index]
-        self.items[index] = ops[self.operation_sign](self.items[index], int(self.operation_num)) // 3
-
+            print("operation", self.operation_num)
+            self.items[index] = ops[self.operation_sign](self.items[index], int(self.operation_num)) // 3
+            self.operation_num = "old"
+        else:
+            self.items[index] = ops[self.operation_sign](self.items[index], int(self.operation_num)) // 3
     def test(self, index):
         if self.items[index] % self.test_num == 0:
             return self.true_monkey
@@ -33,7 +35,7 @@ class Monkey:
             return self.false_monkey
 
 def main():
-    with open('example.txt') as f:
+    with open('input.txt') as f:
         content = [line.strip() for line in f.readlines()]
 
     # monkey_0 = Monkey(content[:6])
@@ -53,7 +55,7 @@ def main():
     for i in range(len(monkey_list)):
         monkey_dict[i] = 0
     for i in range(20):
-        print('Round: ', i)
+        print('Round: ', i+1)
         for monkey in monkey_list:
             print(monkey.num, monkey.items)
         round(monkey_list, monkey_dict)
@@ -61,19 +63,22 @@ def main():
     print(monkey_dict)
     for monkey in monkey_list:
         print(monkey.num, monkey.items)
+    
+    values = sorted(monkey_dict.values())
+    print(values[-1] * values[-2])
 
 def single_monkey(monkey:Monkey, monkey_list:list, monkey_dict:dict):
     for i in range(len(monkey.items)):
         monkey.operation(0)
         new_monkey = monkey.test(0)
         item = monkey.items.pop(0)
+        print(new_monkey, item)
         monkey_list[new_monkey].items.append(item)
         monkey_dict[monkey.num] += 1
 
 def round(monkey_list:list, monkey_dict):
     for monkey in monkey_list:
         single_monkey(monkey, monkey_list, monkey_dict)
-    
 def create_monkey_list(content:list):
     monkey_list = []
     for i in range(0, len(content), 7):
